@@ -32,6 +32,7 @@ const Header = () => {
       </Button>
 
       <div className="flex gap-2 md:order-2">
+        {/* Here order-2 is for the order of the item . For the screen size above medium this section is in in second place*/}
         <Button className="w-12 h-10 hidden sm:inline" color="gray" pill>
           <FaMoon />
         </Button>
@@ -44,6 +45,7 @@ const Header = () => {
       </div>
 
       <Navbar.Collapse>
+        {/* with out as={'div'} it will get error . cz we difine path in two places */}
         <Navbar.Link active={path === "/"} as={'div'}>
           <Link to="/">Home</Link>
         </Navbar.Link>
