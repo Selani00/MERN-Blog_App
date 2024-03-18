@@ -1,8 +1,31 @@
 import { Button, Label, TextInput } from "flowbite-react";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const SignUp = () => {
+  const [formData, setFormData] = useState({});
+  const handleChange = (e)=>{
+    setFormData({...formData, [e.target.id]: e.target.value})
+  };
+
+  const handleSubmit = async(e)=>{
+    // Prevent the refresh of the page after submit
+    e.prevenDefault();
+    try{
+      const res = await fetch ('/api/auth/signup', {
+        method: 'POST',
+        headers :{ 'Content-Type': 'application/json'}, 
+        // Convert the object to a JSON string
+        body: JSON.stringify(formData)
+      });
+      // to use this we get this
+      const data = await res.json();
+
+    }catch(err){
+
+    }
+  }
+  
   return (
     <div className="min-h-screen mt-20">
       <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
@@ -22,20 +45,20 @@ const SignUp = () => {
 
         {/*  right */}
         <div className="flex-1">
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div>
               <Label value="Your Name"></Label>
-              <TextInput type="text" placeholder="UserName" id='username'></TextInput>
+              <TextInput type="text" placeholder="UserName" id='username'  onChange={handleChange}></TextInput>
             </div>
 
             <div>
               <Label value="Your Email"></Label>
-              <TextInput type="email" placeholder="example@gmail.com" id='email'></TextInput>
+              <TextInput type="email" placeholder="example@gmail.com" id='email' onChange={handleChange}></TextInput>
             </div>
 
             <div>
               <Label value="Your Password"></Label>
-              <TextInput type="text" placeholder="Password" id='password'></TextInput>
+              <TextInput type="password" placeholder="Password" id='password' onChange={handleChange}></TextInput>
             </div>
 
             <Button gradientDuoTone='purpleToPink' type='submit'>Sign Up</Button>
