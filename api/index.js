@@ -25,3 +25,15 @@ app.listen(3000, ()=>{
 // request is the data that send to the API. response is the data that we recive from the API.
 app.use('/api/user',userRoutes);
 app.use('/api/auth',authRoutes);
+
+//middleware function to handle the error
+// next is a function that we call when we are done with the current middleware function.
+app.use((err,req,res,next)=>{
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal server error";
+    res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message
+    });
+});
