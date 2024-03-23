@@ -61,7 +61,7 @@ export const signin = async (req, res,next) => {
       // secret key is unique key for that is only for you.
       process.env.JWT_SECRET); // As long as the browser is open, the cookie will be stored in the browser.
 
-      // need to separate the password from the user object
+      // need to separate the password from the user object. To hide the hash password form browser inspect
       const { password: pass, ...rest} = validuser._doc;
 
       res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);

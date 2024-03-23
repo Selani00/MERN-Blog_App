@@ -1,13 +1,17 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import React, { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
+import { signInScuccess, signInFailure, signInStart } from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
+
   const [buttonEnabled, setButtonEnabled] = useState(false);
+  const {loading, error: errorMessage} = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
@@ -19,11 +23,13 @@ const SignIn = () => {
 
     // Check if the user has filled in all the fields
     if (!formData.email || !formData.password) {
-      return setErrorMessage("Please fill in all the fields");
+      return dispatch(signInFailure("All fields are required"));
     }
     try {
-      setLoading(true);
-      setErrorMessage(null);
+      // setLoading(true);
+      // setErrorMessage(null);
+
+      dispatch(signInStart()); // This is same as setLoading(true); and   setErrorMessage(null);
 
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -36,30 +42,33 @@ const SignIn = () => {
 
       // It the request is not successful, display the error message
       if (data.success === false) {
-        return setErrorMessage(data.message);
+        dispatch(signInFailure(data.message)); // This is same as setErrorMessage(data.message) and setLoading(false
       }
 
-      setLoading(false);
+      
       
       if (res.ok){
+        dispatch(signInScuccess(data)); 
         navigate("/");
       }
 
       
     } catch (err) {
-      setErrorMessage(err.message);
-      setLoading(false);
+      // setErrorMessage(err.message);
+      // setLoading(false);
+
+      dispatch(signInFailure(err.message)); // This is same as setErrorMessage(err.message) and setLoading(false)
     }
   };
 
   // To handle the loading effect
-  const handleButtonClick =()=>{
-    setLoading(true);
-    setTimeout(()=>{
-      setLoading(false);
-      setButtonEnabled(false);
-    },2000);
-  };
+  // const handleButtonClick =()=>{
+  //   setLoading(true);
+  //   setTimeout(()=>{
+  //     setLoading(false);
+  //     setButtonEnabled(false);
+  //   },2000);
+  // };
 
   return (
     <div className="min-h-screen mt-20">
@@ -106,8 +115,8 @@ const SignIn = () => {
             <Button
               gradientDuoTone="purpleToPink"
               type="submit"
-              disabled={buttonEnabled}
-              onClick={handleButtonClick}
+              disabled={loading}
+              // onClick={handleButtonClick}
             >
               {loading ? (
                 <>
