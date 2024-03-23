@@ -35,7 +35,7 @@ export const signup = async (req, res,next) => {
 };
 
 export const signin = async (req, res,next) => {
-  const {email,password}= res.body;
+  const {email,password}= req.body;
 
   if (!email || !password || email === " " || password === " ") {
     next(errorHandler(400, "All fields are required!!" ));
@@ -46,22 +46,26 @@ export const signin = async (req, res,next) => {
     const validuser= await User.findOne({email});
 
 
-    if(!validuser || !validPassword){
-      next(errorHandler(400, "User not found" ));
+    if(!validuser ){
+      return next(errorHandler(400, "User not found" ));
     }
 
     const validPassword= bcryptjs.compareSync(password,validuser.password);
 
     if(!validPassword){
-      next(errorHandler(400, "Invalid password" ));
+      return next(errorHandler(400, "Invalid password" ));
     }
 
     const token =jwt.sign(
       {id : validuser._id, }, 
       // secret key is unique key for that is only for you.
-      process.env.JWT_SECRET,
-      res.status(200).cookie('access_token',token,{httpOnly:true}).json(validuser)
-      );
+      process.env.JWT_SECRET); // As long as the browser is open, the cookie will be stored in the browser.
+
+      // need to separate the password from the user object
+      const { password: pass, ...rest} = validuser._doc;
+
+      res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);
+      
 
   }catch(err){
     next(err);
